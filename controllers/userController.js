@@ -60,12 +60,17 @@ exports.registerUser = async (req, res) => {
 
 //Logout User
 exports.logoutUser = async (req, res) => {
+let { username, email, password, token } = req.body;
+    console.log(token);
+    token = null;
+    const newData = { username, email, password, token };
 
-    console.log("Req Headers when logout", req.headers.cookie);
-    req.session.destroy();
-    res.clearCookie("user");
-    res.clearCookie("email");
-    res.clearCookie("connect.sid");
-    return res.redirect("/");
+    let user = await User.findOne({ username: username });
+    console.log(token);
+    if (user) {
+        await User.updateOne(user, newData)
+            .then(user => res.status(200).send("Logout successfully"))
+            .catch(err => res.status(500).send("Logout failed"));
+    }
 }
 
